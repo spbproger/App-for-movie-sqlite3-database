@@ -4,12 +4,12 @@
 
 def movie_by_title(title):
     db_connect = DbConnect('netflix.db')
-    db_connect.cur.execute(
-        f"""select title,country,release_year, listed_in, description
+    query = f"""select title,country,release_year, listed_in, description
             from netflix
             where title like '%{title}%'
             order by  release_year desc
-            limit 1""")
+            limit 1"""
+    db_connect.cur.execute(query)
     result = db_connect.cur.fetchone()
     return {
         "title": result[0],
@@ -20,7 +20,7 @@ def movie_by_title(title):
     }
 
 
-def movies_by_years(year1, year2):
+def movies_between_years(year1, year2):
     db_connect = DbConnect('netflix.db')
     query = f"""select title, release_year
                 from netflix
@@ -35,5 +35,21 @@ def movies_by_years(year1, year2):
     return result_list
 
 
-
-    return
+def movies_by_rating(rating):
+    rating_entities = {
+        "children": "'G'",
+        "family": "'G', 'PG', 'PG-13'",
+        "adult": "'R', 'NC-17'"
+    }
+    db_connect = DbConnect('netflix.db')
+    query = f"""select title, rating, description
+                    from netflix
+                    where rating in ({rating_entities[rating]})"""
+    db_connect.cur.execute(query)
+    result = db_connect.cur.fetchall()
+    result_list = []
+    for movie in result:
+        result_list.append({"title": movie[0],
+                            "rating": movie[1],
+                            "description": movie[2]})
+    return result_list
