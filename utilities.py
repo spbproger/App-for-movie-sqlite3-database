@@ -1,4 +1,5 @@
 import sqlite3
+from collections import Counter
 
 
 class DbConnect:
@@ -106,8 +107,21 @@ def movies_by_genre(genre):
     return result_list
 
 
-def actors_list(actor1, actor2):
+def actors_colleagues(actor1, actor2):
     db_connect = DbConnect('netflix.db')
-    query = f"""select `cast` from netflix  where `cast` like '%Ben Lamb%' and `cast` like '%Rose McIver%'"""
+    query = f"""select `cast` 
+                from netflix  
+                where `cast` like '%{actor1}%' 
+                and `cast` like '%{actor2}%'"""
     db_connect.cur.execute(query)
     result = db_connect.cur.fetchall()
+    colleagues = []
+    for cast in result:
+        colleagues.extend(cast[0].split(', '))
+    count = Counter(colleagues)
+    colleagues_checklist = []
+    for actor, count in count.items():
+        if actor not in [actor1, actor2] and count > 2:
+            colleagues_checklist.append(actor)
+    return colleagues_checklist
+
