@@ -10,21 +10,21 @@ class DbConnect:
         self.cur.close()
         self.con.close()
 
-#
+
 # def exec_query(query, path='netflix.db'):
 #     with sqlite3.connect(path) as con:
 #         cur = con.cursor()
 #         cur.execute(query)
-#         result = cur.fetchall()
+#         result = cur.fetchone()
 #     return result
-
-
+#
+#
 # def movie_by_title2(title):
-#     query = f"""select title,country,release_year, listed_in, description
+#     query = f"""select title, country, release_year, listed_in, description
 #                 from netflix
 #                 where title like '%{title}%'
 #                 order by  release_year desc
-#                 limit 1"""
+#                 limit 100"""
 #     result = exec_query(query)
 #     return {
 #         "title": result[0],
@@ -37,11 +37,11 @@ class DbConnect:
 
 def movie_by_title(title):
     db_connect = DbConnect('netflix.db')
-    query = f"""select title,country,release_year, listed_in, description
-            from netflix
-            where title like '%{title}%'
-            order by  release_year desc
-            limit 1"""
+    query = f"""select title, country, release_year, listed_in, description
+                from netflix
+                where title like '%{title}%'
+                order by  release_year 
+                desc limit 1"""
     db_connect.cur.execute(query)
     result = db_connect.cur.fetchone()
     return {
@@ -78,8 +78,8 @@ def movies_by_rating(rating):
         return "Выбранной Вами группы/категории не представлено"
     db_connect = DbConnect('netflix.db')
     query = f"""select title, rating, description
-                    from netflix
-                    where rating in ({rating_entities[rating]})"""
+                from netflix
+                where rating in ({rating_entities[rating]})"""
     db_connect.cur.execute(query)
     result = db_connect.cur.fetchall()
     result_list = []
@@ -89,3 +89,25 @@ def movies_by_rating(rating):
                             "description": movie[2]})
     return result_list
 
+
+def movies_by_genre(genre):
+    db_connect = DbConnect('netflix.db')
+    query = f"""select title, description
+                from netflix
+                where listed_in like '%{genre}%'
+                order by release_year desc
+                limit 10"""
+    db_connect.cur.execute(query)
+    result = db_connect.cur.fetchall()
+    result_list = []
+    for movie in result:
+        result_list.append({"title": movie[0],
+                            "description": movie[1]})
+    return result_list
+
+
+def actors_list(actor1, actor2):
+    db_connect = DbConnect('netflix.db')
+    query = f"""select `cast` from netflix  where `cast` like '%Ben Lamb%' and `cast` like '%Rose McIver%'"""
+    db_connect.cur.execute(query)
+    result = db_connect.cur.fetchall()
