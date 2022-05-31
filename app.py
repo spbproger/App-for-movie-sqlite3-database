@@ -13,11 +13,6 @@ def get_movie_by_title(title):
     return movie_by_title(title)
 
 
-# @app.route('/movie2/<title>')
-# def get_movie_by_title2(title):
-#     return movie_by_title2(title)
-
-
 @app.route('/movie/<int:year1>/to/<int:year2>')
 def get_movies_between_years(year1, year2):
     return jsonify(movies_between_years(year1, year2))
@@ -31,6 +26,17 @@ def get_movies_by_rating(category):
 @app.route('/genre/<genre>')
 def get_movies_by_genre(genre):
     return jsonify(movies_by_genre(genre))
+
+
+@app.route('/actors/with/<actor1>/and/<actor2>')
+def get_actors_colleagues(actor1, actor2):
+    return actors_colleagues(actor1, actor2)
+
+
+@app.route('/movie/<typ>/<release_year>/<listed_in>')  #
+def get_movies_by_params(typ, release_year, listed_in):
+    return jsonify(movies_by_params(typ, release_year, listed_in))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
